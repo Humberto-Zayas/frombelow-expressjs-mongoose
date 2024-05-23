@@ -39,4 +39,4 @@ const DaySchema = new Schema({
 
 const DayModel = model<IDay>('Day', DaySchema);
 
-export { DayModel, IDay };
+export { DayModel, IDay, IHour };

@@ -4,6 +4,21 @@ import { AvailabilityModel, IAvailability } from '../models/availability';
 
 const router = Router();
 
+router.get('/days/:date', async (req, res) => {
+  console.log(`Request received for date: ${req.params.date}`);
+
+  try {
+    const day: IDay | null = await DayModel.findOne({ date: req.params.date });
+    if (day) {
+      res.json(day);
+    } else {
+      res.status(404).json({ error: 'Day not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 router.get('/days', async (req, res) => {
   try {
     const days: IDay[] = await DayModel.find();
@@ -17,19 +32,6 @@ router.get('/blackoutDays', async (req, res) => {
   try {
     const blackoutDays: IDay[] = await DayModel.find({ disabled: true });
     res.json(blackoutDays);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-router.get('/days/:date', async (req, res) => {
-  try {
-    const day: IDay | null = await DayModel.findOne({ date: req.params.date });
-    if (day) {
-      res.json(day);
-    } else {
-      res.status(404).json({ error: 'Day not found' });
-    }
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -65,7 +67,11 @@ router.post('/editDay', async (req, res) => {
   try {
     const { date, disabled } = req.body;
 
+    console.log(date)
+
     let existingDay: IDay | null = await DayModel.findOne({ date });
+
+    console.log(existingDay)
 
     if (!existingDay) {
       existingDay = await DayModel.create({ date, disabled, hours: [] }); // Initialize hours array for a new day
