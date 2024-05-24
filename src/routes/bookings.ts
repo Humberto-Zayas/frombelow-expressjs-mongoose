@@ -58,14 +58,6 @@ router.put('/bookings/:id', async (req: Request, res: Response) => {
     const bookingId = req.params.id;
     const { status } = req.body;
 
-    const availableHours = [
-      '2 Hours/$70',
-      '4 Hours/$130',
-      '8 Hours/$270',
-      '10 Hours/$340',
-      'Full Day 14+ Hours/$550',
-    ];
-
     const updatedBooking: IBooking | null = await Booking.findByIdAndUpdate(
       bookingId,
       { status },
@@ -74,50 +66,6 @@ router.put('/bookings/:id', async (req: Request, res: Response) => {
 
     if (!updatedBooking) {
       return res.status(404).json({ error: 'Booking not found' });
-    }
-
-    if (status === 'confirmed') {
-      const bookingDay: IDay | null = await DayModel.findOne({ date: updatedBooking.date });
-
-      if (bookingDay) {
-        bookingDay.hours = bookingDay.hours.filter(hourBlock => hourBlock.hour !== updatedBooking.hours);
-
-        const hoursArrayIsEmpty = bookingDay.hours.length === 0;
-
-        if (hoursArrayIsEmpty) {
-          availableHours.forEach(hour => {
-            if (hour !== updatedBooking.hours) {
-              bookingDay.hours.push({ hour, enabled: true } as IHour);
-            }
-          });
-
-          bookingDay.hours.sort((a, b) => {
-            const hourA = availableHours.indexOf(a.hour);
-            const hourB = availableHours.indexOf(b.hour);
-            return hourA - hourB;
-          });
-        }
-
-        await bookingDay.save();
-      }
-    } else if (status === 'denied') {
-      const bookingDay: IDay | null = await DayModel.findOne({ date: updatedBooking.date });
-
-      if (bookingDay) {
-        const deniedHourExists = bookingDay.hours.some(hourBlock => hourBlock.hour === updatedBooking.hours);
-
-        if (!deniedHourExists) {
-          bookingDay.hours.push({ hour: updatedBooking.hours, enabled: true } as IHour);
-
-          bookingDay.hours.sort((a, b) => {
-            const hourA = availableHours.indexOf(a.hour);
-            const hourB = availableHours.indexOf(b.hour);
-            return hourA - hourB;
-          });
-
-          await bookingDay.save();
-        }
-      }
     }
 
     res.json(updatedBooking);
@@ -132,55 +80,17 @@ router.put('/bookings/datehour/:id', async (req: Request, res: Response) => {
     const bookingId = req.params.id;
     const { date, hours } = req.body;
 
-    const booking: IBooking | null = await Booking.findById(bookingId);
-    if (!booking) {
+    const updatedBooking: IBooking | null = await Booking.findByIdAndUpdate(
+      bookingId,
+      { date, hours },
+      { new: true }
+    );
+
+    if (!updatedBooking) {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
-    const oldDate = booking.date;
-    const oldHours = booking.hours;
-
-    booking.date = date;
-    booking.hours = hours;
-    await booking.save();
-
-    const oldDateExists = await DayModel.exists({ date: oldDate });
-
-    if (oldDateExists) {
-      const oldDay = await DayModel.findOne({ date: oldDate });
-
-      const matchingOldHour = oldDay?.hours.find(hourBlock => hourBlock.hour.includes(oldHours));
-      if (matchingOldHour) {
-        matchingOldHour.enabled = true;
-      }
-      oldDay?.hours.push({ hour: oldHours, enabled: true } as IHour);
-      await oldDay?.save();
-    }
-
-    const newDateExists = await DayModel.exists({ date });
-
-    if (newDateExists) {
-      const newDay = await DayModel.findOne({ date });
-
-      const correspondingHour = newDay?.hours.find(hourBlock => hourBlock.hour.includes(hours));
-      if (correspondingHour) {
-        correspondingHour.enabled = false;
-      }
-
-      newDay?.hours.filter(hourBlock => hourBlock.hour !== hours);
-
-      const matchingOldHour = newDay?.hours.find(hourBlock => hourBlock.hour.includes(oldHours));
-      if (matchingOldHour) {
-        matchingOldHour.enabled = true;
-      }
-
-      await newDay?.save();
-    } else {
-      const newHourBlock: IHour = { hour: hours, enabled: true } as IHour;
-      await DayModel.create({ date, hours: [newHourBlock], disabled: false });
-    }
-
-    res.json({ message: 'Booking updated successfully' });
+    res.json({ message: 'Booking updated successfully', updatedBooking });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     res.status(400).json({ error: errorMessage });
