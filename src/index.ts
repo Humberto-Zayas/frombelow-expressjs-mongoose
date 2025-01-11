@@ -36,10 +36,11 @@ app.post('/send-email', async (req, res) => {
 
   try {
     await sendEmail(to, subject, text);
-    res.status(200).send('Email sent');
+    res.json({ message: "Email sent successfully" });
+
   } catch (error) {
     console.error('Error sending email:', error);
-    res.status(500).send('Error sending email');
+    res.status(500).send({message: 'Error sending email'});
   }
 });
 
