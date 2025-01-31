@@ -56,11 +56,15 @@ router.get('/bookings/:id', async (req: Request, res: Response) => {
 router.put('/bookings/:id', async (req: Request, res: Response) => {
   try {
     const bookingId = req.params.id;
-    const { status } = req.body;
+    const { status, paymentMethod } = req.body;
+
+    const updateFields: Partial<IBooking> = {};
+    if (status) updateFields.status = status;
+    if (paymentMethod) updateFields.paymentMethod = paymentMethod;
 
     const updatedBooking: IBooking | null = await Booking.findByIdAndUpdate(
       bookingId,
-      { status },
+      updateFields,
       { new: true }
     );
 
