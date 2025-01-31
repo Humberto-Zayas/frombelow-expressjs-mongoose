@@ -10,6 +10,8 @@ interface IBooking extends Document {
   date: string;
   hours: string;
   status: 'unconfirmed' | 'confirmed' | 'denied';
+  paymentStatus: 'paid' | 'unpaid';
+  paymentMethod: 'venmo' | 'cashapp' | 'zelle' | 'cash' | 'none';
 }
 
 // Create the schema for the Booking model
@@ -44,6 +46,16 @@ const BookingSchema = new Schema<IBooking>({
     type: String,
     enum: ['unconfirmed', 'confirmed', 'denied'],
     default: 'unconfirmed',
+  },
+  paymentStatus: {
+    type: String,
+    enum: ['paid', 'unpaid'],
+    default: 'unpaid',
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['venmo', 'cashapp', 'zelle', 'cash', 'none'],
+    default: 'none',
   },
 });
 
