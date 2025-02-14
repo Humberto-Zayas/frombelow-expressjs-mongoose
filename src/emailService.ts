@@ -92,7 +92,7 @@ export const sendStatusEmail = async (
       To secure your booking, please complete your deposit at the following link:
       ${depositLink || 'No deposit link provided.'}
 
-      If you have any questions, feel free to reach out. We look forward to seeing you!
+      If you have any questions, feel free to reach out to us at frombelowstudio@gmail.com.
     `.trim();
   } else if (status === 'denied') {
     subject = 'Your Booking Has Been Denied';
@@ -100,7 +100,7 @@ export const sendStatusEmail = async (
       We're sorry to inform you that your booking request has been denied.
       Booking ID: ${bookingId}
 
-      If you have any questions or concerns, please don't hesitate to contact us.
+      If you have any questions or concerns, please reach out to us at frombelowstudio@gmail.com.
     `.trim();
   } else {
     throw new Error('Invalid status. Status should be "confirmed" or "denied".');
