@@ -134,6 +134,7 @@ export const sendStatusEmail = async (
 export const sendBookingChangeEmail = async (
   to: string,
   name: string,
+  id: number,
   newDate: string,
   newHours: string
 ): Promise<void> => {
@@ -145,8 +146,9 @@ export const sendBookingChangeEmail = async (
 
     New Date: ${newDate}
     New Hours: ${newHours}
+    Booking Status: ${process.env.FRONTEND_URL}/booking/${id}
 
-    If you have any questions, feel free to reach out.
+    If you have any questions, feel free to reach out to frombelowstudio@gmail.com.
 
     Thank you!
   `.trim();

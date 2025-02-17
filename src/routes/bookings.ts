@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { Booking, IBooking } from '../models/booking';
 import { DayModel, IDay, IHour } from '../models/day';
+import { sendEmail } from '../emailService';
 
 const router = Router();
 
@@ -23,6 +24,28 @@ router.post('/bookings', async (req: Request, res: Response) => {
       hours,
       status: 'unconfirmed',
     });
+
+    // Construct deposit payment link
+    const depositPaymentLink = `${process.env.FRONTEND_URL}/booking/${booking._id}`;
+
+    // Send email with booking ID and deposit instructions
+    await sendEmail(
+      email,
+      'From Below Studio Booking Confirmation & Deposit Instructions',
+      `Hello ${name},
+
+      Your booking request has been received and is now pending confirmation.
+      
+      **Booking Details:**
+      - Date: ${date}
+      - Hours: ${hours}
+      
+      To secure your booking, please submit a deposit using the following link:
+
+      ${depositPaymentLink}
+
+      If you have any questions or concerns please reach out to frombelowstudio@gmail.com.`
+    );
 
     res.json(booking);
   } catch (error) {

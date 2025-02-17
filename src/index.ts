@@ -58,12 +58,10 @@ app.post('/send-status-email', async (req, res) => {
 });
 
 app.post('/send-booking-change-email', async (req, res) => {
-  const { to, name, newDate, newHours } = req.body;
-
-  console.log(req.body)
+  const { to, name, id, newDate, newHours } = req.body;
 
   try {
-    await sendBookingChangeEmail(to, name, newDate, newHours);
+    await sendBookingChangeEmail(to, name, id, newDate, newHours);
     res.json({ message: `Booking change email sent successfully to ${to}` });
   } catch (error) {
     console.error('Error sending booking change email:', error);
