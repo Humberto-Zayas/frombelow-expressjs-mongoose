@@ -4,7 +4,7 @@ import cors from "cors"; // Import the cors module
 import countryRoutes from "./routes/country";
 import dayRoutes from "./routes/days";
 import bookingRoutes from './routes/bookings';
-import { sendEmail, sendStatusEmail } from './emailService';
+import { sendEmail, sendStatusEmail, sendBookingChangeEmail } from './emailService';
 
 const app = express();
 const port = process.env.PORT || 3333;
@@ -54,6 +54,20 @@ app.post('/send-status-email', async (req, res) => {
   } catch (error) {
     console.error('Error sending status email:', error);
     res.status(500).send({ message: 'Error sending status email' });
+  }
+});
+
+app.post('/send-booking-change-email', async (req, res) => {
+  const { to, name, newDate, newHours } = req.body;
+
+  console.log(req.body)
+
+  try {
+    await sendBookingChangeEmail(to, name, newDate, newHours);
+    res.json({ message: `Booking change email sent successfully to ${to}` });
+  } catch (error) {
+    console.error('Error sending booking change email:', error);
+    res.status(500).send({ message: 'Error sending booking change email' });
   }
 });
 

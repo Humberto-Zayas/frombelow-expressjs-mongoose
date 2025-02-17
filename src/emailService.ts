@@ -121,3 +121,48 @@ export const sendStatusEmail = async (
     throw new Error(`Failed to send status email to ${to}`);
   }
 };
+
+/**
+ * Sends an email notification when a booking is updated.
+ * 
+ * @param to - The recipient's email address.
+ * @param name - The name of the client.
+ * @param newDate - The updated date of the booking.
+ * @param newHours - The updated hours of the booking.
+ * @returns A Promise resolving the result of the email send operation.
+ */
+export const sendBookingChangeEmail = async (
+  to: string,
+  name: string,
+  newDate: string,
+  newHours: string
+): Promise<void> => {
+  const subject = 'Your Booking Has Been Updated';
+  const text = `
+    Hello ${name},
+
+    Your booking has been updated. Here are the new details:
+
+    New Date: ${newDate}
+    New Hours: ${newHours}
+
+    If you have any questions, feel free to reach out.
+
+    Thank you!
+  `.trim();
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to,
+    subject,
+    text,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Booking change email sent successfully to ${to}`);
+  } catch (error) {
+    console.error(`Failed to send booking change email to ${to}:`, error);
+    throw new Error(`Failed to send booking change email to ${to}`);
+  }
+};

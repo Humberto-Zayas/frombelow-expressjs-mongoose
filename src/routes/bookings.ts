@@ -95,7 +95,7 @@ router.put('/bookings/datehour/:id', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
-    res.json({ message: 'Booking updated successfully', updatedBooking });
+    res.json(updatedBooking); // <-- Now it returns the full object directly
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     res.status(400).json({ error: errorMessage });
