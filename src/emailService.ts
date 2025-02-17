@@ -168,3 +168,53 @@ export const sendBookingChangeEmail = async (
     throw new Error(`Failed to send booking change email to ${to}`);
   }
 };
+
+/**
+ * Sends an email notification when a booking payment status is updated.
+ * 
+ * @param to - The recipient's email address.
+ * @param name - The name of the client.
+ * @param id - The booking ID.
+ * @param paymentStatus - The updated payment status.
+ * @returns A Promise resolving the result of the email send operation.
+ */
+export const sendPaymentStatusEmail = async (
+  to: string,
+  name: string,
+  id: string,
+  paymentStatus: string
+): Promise<void> => {
+  const subject = 'Payment Status Updated for Your Booking';
+  const text = `
+    Hello ${name},
+
+    Your payment status for your booking has been updated.
+
+    **Booking Details:**
+    - Booking ID: ${id}
+    - New Payment Status: ${paymentStatus}
+
+    You can view your booking here:
+    ${process.env.FRONTEND_URL}/booking/${id}
+
+    If you have any questions, feel free to reach out to frombelowstudio@gmail.com.
+
+    Best regards,  
+    From Below Studio
+  `.trim();
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to,
+    subject,
+    text,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Payment status email sent successfully to ${to}`);
+  } catch (error) {
+    console.error(`Failed to send payment status email to ${to}:`, error);
+    throw new Error(`Failed to send payment status email to ${to}`);
+  }
+};
