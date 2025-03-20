@@ -26,7 +26,7 @@ router.post('/bookings', async (req: Request, res: Response) => {
     });
 
     // Construct deposit payment link
-    const depositPaymentLink = `${process.env.FRONTEND_URL}/booking/${booking._id}`;
+    const depositPaymentLink = `${process.env.FRONTEND_URL}booking/${booking._id}`;
 
     // Send email with booking ID and deposit instructions
     await sendEmail(
