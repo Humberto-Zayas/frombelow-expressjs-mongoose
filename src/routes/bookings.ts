@@ -3,6 +3,12 @@ import { Booking, IBooking } from '../models/booking';
 import { DayModel, IDay, IHour } from '../models/day';
 import { sendEmail } from '../emailService';
 
+  // Determine the base URL based on the environment
+  const baseUrl =
+    process.env.NODE_ENV === 'production'
+      ? 'https://frombelowstudio.com'
+      : 'http://localhost:3000';
+
 const router = Router();
 
 router.post('/bookings', async (req: Request, res: Response) => {
@@ -26,7 +32,7 @@ router.post('/bookings', async (req: Request, res: Response) => {
     });
 
     // Construct deposit payment link
-    const depositPaymentLink = `${process.env.FRONTEND_URL}booking/${booking._id}`;
+    const depositPaymentLink = `${baseUrl}/booking/${booking._id}`;
 
     // Send email with booking ID and deposit instructions
     await sendEmail(
