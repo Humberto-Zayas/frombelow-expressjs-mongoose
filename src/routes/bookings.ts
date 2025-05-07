@@ -3,11 +3,11 @@ import { Booking, IBooking } from '../models/booking';
 import { DayModel, IDay, IHour } from '../models/day';
 import { sendEmail } from '../emailService';
 
-  // Determine the base URL based on the environment
-  const baseUrl =
-    process.env.NODE_ENV === 'production'
-      ? 'https://frombelowstudio.com'
-      : 'http://localhost:3000';
+// Determine the base URL based on the environment
+const baseUrl =
+  process.env.NODE_ENV === 'production'
+    ? 'https://frombelowstudio.com'
+    : 'http://localhost:3000';
 
 const router = Router();
 

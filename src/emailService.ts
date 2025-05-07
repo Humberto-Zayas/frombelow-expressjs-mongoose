@@ -14,6 +14,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Determine the base URL based on the environment
+const baseUrl =
+  process.env.NODE_ENV === 'production'
+    ? 'https://frombelowstudio.com'
+    : 'http://localhost:3000';
+
 /**
  * Sends an email with optional booking details.
  * 
@@ -86,14 +92,15 @@ export const sendStatusEmail = async (
   if (status === 'confirmed') {
     subject = 'Your Booking Has Been Confirmed';
     text = `
-      We're excited to let you know that your booking has been confirmed! 🎉
-      Booking ID: ${bookingId}
+We're excited to let you know that your booking has been confirmed! 🎉
 
-      To secure your booking, please complete your deposit at the following link:
-      ${depositLink || 'No deposit link provided.'}
+Booking ID: ${bookingId}
 
-      If you have any questions, feel free to reach out to us at frombelowstudio@gmail.com.
-    `.trim();
+You can view the status of your booking at the following link:
+${depositLink || 'No deposit link provided.'}
+
+If you have any questions, feel free to reach out to us at frombelowstudio@gmail.com.`.trim();
+
   } else if (status === 'denied') {
     subject = 'Your Booking Has Been Denied';
     text = `
@@ -195,7 +202,7 @@ export const sendPaymentStatusEmail = async (
     - New Payment Status: ${paymentStatus}
 
     You can view your booking here:
-    ${process.env.FRONTEND_URL}/booking/${id}
+    ${baseUrl}/booking/${id}
 
     If you have any questions, feel free to reach out to frombelowstudio@gmail.com.
 
