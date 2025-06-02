@@ -225,3 +225,51 @@ export const sendPaymentStatusEmail = async (
     throw new Error(`Failed to send payment status email to ${to}`);
   }
 };
+
+/**
+ * Sends a cash payment notification email to the admin so they can confirm it manually.
+ *
+ * @param to - Admin email address.
+ * @param clientName - Name of the client.
+ * @param bookingId - The related booking ID.
+ * @param paymentMethod - e.g., 'Cash', 'Cash App', 'Zelle', etc.
+ * @param notes - Optional additional info provided by the client.
+ */
+export const sendAdminCashPaymentNotificationEmail = async (
+  to: string,
+  clientName: string,
+  bookingId: string,
+  paymentMethod: string,
+  notes?: string
+): Promise<void> => {
+  const subject = `Manual Payment Confirmation Needed for Booking ${bookingId}`;
+  const adminLink = `${baseUrl}/admin?component=bookings`;
+
+  const text = `
+Hello Admin,
+
+${clientName} has submitted a manual payment using "${paymentMethod}" for booking ID: ${bookingId}.
+${notes ? `Client Notes:\n"${notes}"\n` : ''}  
+Please review and confirm the payment manually in the admin dashboard:
+
+${adminLink}
+
+Thanks,  
+From Below Studio
+`.trim();
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to,
+    subject,
+    text,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Cash payment notification email sent to ${to}`);
+  } catch (error) {
+    console.error(`Failed to send cash payment notification email to ${to}:`, error);
+    throw new Error(`Failed to send cash payment notification email to ${to}`);
+  }
+};

@@ -5,7 +5,6 @@ import countryRoutes from "./routes/country";
 import dayRoutes from "./routes/days";
 import bookingRoutes from './routes/bookings';
 import emailRoutes from './routes/email';
-import { sendEmail, sendStatusEmail, sendBookingChangeEmail, sendPaymentStatusEmail } from './emailService';
 
 const app = express();
 const port = process.env.PORT || 3333;

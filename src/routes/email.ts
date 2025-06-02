@@ -3,7 +3,8 @@ import {
   sendEmail,
   sendStatusEmail,
   sendBookingChangeEmail,
-  sendPaymentStatusEmail
+  sendPaymentStatusEmail,
+  sendAdminCashPaymentNotificationEmail
 } from '../emailService';
 import { Booking, IBooking } from '../models/booking';
 
@@ -70,5 +71,17 @@ router.post('/send-payment-status-email', async (req: Request, res: Response) =>
     res.status(500).send({ message: 'Error sending payment status email' });
   }
 });
+
+router.post('/send-cash-payment-notification', async (req: Request, res: Response) => {
+  const { to, clientName, bookingId, paymentMethod, notes } = req.body;
+  try {
+    await sendAdminCashPaymentNotificationEmail(to, clientName, bookingId, paymentMethod, notes);
+    res.json({ message: `Cash payment notification email sent successfully to ${to}` });
+  } catch (error) {
+    console.error('Error sending cash payment notification email:', error);
+    res.status(500).send({ message: 'Error sending cash payment notification email' });
+  }
+});
+
 
 export default router;
