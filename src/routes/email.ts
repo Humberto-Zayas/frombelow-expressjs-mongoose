@@ -11,10 +11,9 @@ import { Booking, IBooking } from '../models/booking';
 const router = Router();
 
 router.post('/send-email', async (req: Request, res: Response) => {
-  const { to, subject, text } = req.body;
+  const { to, subject, text, bookingDetails, isAdmin } = req.body;
   try {
-    await sendEmail(to, subject, text);
-    res.json({ message: 'Email sent successfully' });
+    await sendEmail(to, subject, text, bookingDetails, isAdmin);    res.json({ message: 'Email sent successfully' });
   } catch (error) {
     console.error('Error sending email:', error);
     res.status(500).send({ message: 'Error sending email' });

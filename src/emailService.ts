@@ -34,24 +34,35 @@ export const sendEmail = async (
   to: string,
   subject: string,
   text: string,
-  bookingDetails?: Record<string, any>
+  bookingDetails?: Record<string, any>,
+  isAdmin: boolean = false
 ): Promise<void> => {
-  // Format the email content
-  const formattedDetails = bookingDetails
-    ? `
-      ${text}
+  const baseUrl = process.env.NODE_ENV === 'production'
+  ? 'https://frombelowstudio.com'
+  : 'http://localhost:3000';
 
-      Booking Details:
-      ----------------
-      Name: ${bookingDetails.name}
-      Email: ${bookingDetails.email}
-      Phone Number: ${bookingDetails.phoneNumber}
-      Message: ${bookingDetails.message}
-      How Did You Hear: ${bookingDetails.howDidYouHear}
-      Date: ${bookingDetails.date}
-      Hours: ${bookingDetails.hours}
-    `.trim()
-    : text;
+const bookingLink = bookingDetails?._id
+  ? `${baseUrl}/booking/${bookingDetails._id}`
+  : '';
+
+const formattedDetails = bookingDetails
+  ? `
+    ${isAdmin
+      ? `${bookingDetails.name} has sent a new booking request. Manage it here: ${bookingLink}`
+      : text}
+
+    Booking Details:
+    ----------------
+    Name: ${bookingDetails.name}
+    Email: ${bookingDetails.email}
+    Phone Number: ${bookingDetails.phoneNumber}
+    Message: ${bookingDetails.message}
+    How Did You Hear: ${bookingDetails.howDidYouHear}
+    Date: ${bookingDetails.date}
+    Hours: ${bookingDetails.hours}
+  `.trim()
+  : text;
+
 
   // Email configuration
   const mailOptions = {
