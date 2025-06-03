@@ -56,18 +56,17 @@ router.post('/bookings', async (req: Request, res: Response) => {
     await sendEmail(
       'hzayas1213@gmail.com', // Or use process.env.ADMIN_EMAIL
       'New Booking Request Submitted',
-      `${name} has submitted a new booking request.
+`${name} has submitted a new booking request.
     
-    Booking link:
-    ${depositPaymentLink}
+Booking link:
+${depositPaymentLink}
     
-    Date: ${date}
-    Hours: ${hours}
-    Email: ${email}
-    Phone: ${phoneNumber}
-    Message: ${message}
-    Heard about us via: ${howDidYouHear}`
-    );
+Date: ${date}
+Hours: ${hours}
+Email: ${email}
+Phone: ${phoneNumber}
+Message: ${message}
+Heard about us via: ${howDidYouHear}`);
 
     res.json(booking);
   } catch (error) {
