@@ -101,6 +101,9 @@ export const sendStatusEmail = async (
   let subject: string;
   let text: string;
 
+  const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1);
+
+
   if (status === 'confirmed') {
     subject = `Your Session for ${date} Has Been Confirmed`;
     text = `
@@ -111,7 +114,7 @@ ${baseUrl}/booking/${bookingId}
 
 **Booking Details:**
   - Booking Date: ${date}
-  - Session Status: ${status}
+  - Session Status: ${formattedStatus}
 
 If you have any questions, feel free to reach out to us at frombelowstudio@gmail.com.`.trim();
 
@@ -125,7 +128,7 @@ ${baseUrl}/booking/${bookingId}
 
 **Booking Details:**
   - Requested Booking Date: ${date}
-  - Session Status: ${status}
+  - Session Status: ${formattedStatus}
 
 If you have any questions or concerns, please reach out to us at frombelowstudio@gmail.com.`.trim();
   } else {

@@ -36,7 +36,7 @@ router.post('/send-status-email', async (req: Request, res: Response) => {
       day: 'numeric',
     });
 
-    const formattedStatus = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
+    // const formattedStatus = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
 
 
     // 2) If it's already confirmed, don’t send again
@@ -47,7 +47,7 @@ router.post('/send-status-email', async (req: Request, res: Response) => {
     // }
 
     // 3) Otherwise, send the status email
-    await sendStatusEmail(to, formattedStatus, bookingId, depositLink, formattedDate);
+    await sendStatusEmail(to, status, bookingId, depositLink, formattedDate);
     res.json({
       message: `Status email (${status}) sent successfully to ${to}`
     });
