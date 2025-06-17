@@ -95,31 +95,39 @@ export const sendStatusEmail = async (
   to: string,
   status: string,
   bookingId: string,
-  depositLink?: string
+  depositLink?: string,
+  date?: string
 ): Promise<void> => {
   let subject: string;
   let text: string;
 
   if (status === 'confirmed') {
-    subject = 'Your Booking Has Been Confirmed';
+    subject = `Your Session for ${date} Has Been Confirmed`;
     text = `
-We're excited to let you know that your booking has been confirmed! 🎉
+We're excited to let you know that your booking for ${date} has been confirmed! 🎉
 
-Booking ID: ${bookingId}
+You can view and add your booking to your calendar here:
+${baseUrl}/booking/${bookingId}
 
-You can view the status of your booking at the following link:
-${depositLink || 'No deposit link provided.'}
+**Booking Details:**
+  - Booking Date: ${date}
+  - Session Status: ${status}
 
 If you have any questions, feel free to reach out to us at frombelowstudio@gmail.com.`.trim();
 
   } else if (status === 'denied') {
-    subject = 'Your Booking Has Been Denied';
+    subject = `Your Session for ${date} Has Been Denied`;
     text = `
-      We're sorry to inform you that your booking request has been denied.
-      Booking ID: ${bookingId}
+      We're sorry to inform you that your booking request for ${date} has been denied.
 
-      If you have any questions or concerns, please reach out to us at frombelowstudio@gmail.com.
-    `.trim();
+You can view the status of the booking here:
+${baseUrl}/booking/${bookingId}
+
+**Booking Details:**
+  - Requested Booking Date: ${date}
+  - Session Status: ${status}
+
+If you have any questions or concerns, please reach out to us at frombelowstudio@gmail.com.`.trim();
   } else {
     throw new Error('Invalid status. Status should be "confirmed" or "denied".');
   }
@@ -194,32 +202,40 @@ export const sendBookingChangeEmail = async (
  * @param name - The name of the client.
  * @param id - The booking ID.
  * @param paymentStatus - The updated payment status.
+ * @param date
  * @returns A Promise resolving the result of the email send operation.
  */
+
 export const sendPaymentStatusEmail = async (
   to: string,
   name: string,
   id: string,
-  paymentStatus: string
+  paymentStatus: string,
+  date: string
 ): Promise<void> => {
-  const subject = 'Payment Status Updated for Your Booking';
+
+  const formattedStatus = paymentStatus
+  .split('_') // ['deposit', 'paid']
+  .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // ['Deposit', 'Paid']
+  .join(' '); // 'Deposit Paid'
+
+  const subject = `Your Session for ${date} is Confirmed`;
   const text = `
     Hello ${name},
 
-    Your payment status for your booking has been updated.
+Your payment status for your booking, on ${date}, has been updated and the session is confirmed! 🎉
 
-    **Booking Details:**
-    - Booking ID: ${id}
-    - New Payment Status: ${paymentStatus}
+**Booking Details:**
+  - Booking Date: ${date}
+  - New Payment Status: ${formattedStatus}
 
-    You can view your booking here:
-    ${baseUrl}/booking/${id}
+You can view and add your booking to your calendar here:
+${baseUrl}/booking/${id}
 
-    If you have any questions, feel free to reach out to frombelowstudio@gmail.com.
+If you have any questions, feel free to reach out to frombelowstudio@gmail.com.
 
-    Best regards,  
-    From Below Studio
-  `.trim();
+Best regards,  
+From Below Studio`.trim();
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -257,13 +273,13 @@ export const sendAdminCashPaymentNotificationEmail = async (
   const adminLink = `${baseUrl}/admin?component=bookings`;
 
   const text = `
-Hello Admin,
 
-${clientName} has submitted a manual payment using "${paymentMethod}" for booking ID: ${bookingId}.
+
+${clientName} wants to pay using ${paymentMethod} for their session.
 ${notes ? `Client Notes:\n"${notes}"\n` : ''}  
-Please review and confirm the payment manually in the admin dashboard:
+Review and confirm the session manually in the admin dashboard:
 
-${adminLink}
+${baseUrl}/booking/${bookingId}
 
 Thanks,  
 From Below Studio

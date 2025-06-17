@@ -17,7 +17,7 @@ router.post('/bookings', async (req: Request, res: Response) => {
 
     const checkDate = await DayModel.findOne({ date });
     if (!checkDate) {
-      await DayModel.create({ date, disabled: false, hours: [] });
+      await DayModel.create({ date, disabled: false });
     }
 
     const booking: IBooking = await Booking.create({
@@ -31,37 +31,42 @@ router.post('/bookings', async (req: Request, res: Response) => {
       status: 'unconfirmed',
     });
 
+    // Format date to M/D/YY
+    const formattedDate = new Date(date).toLocaleDateString('en-US', {
+      year: '2-digit',
+      month: 'numeric',
+      day: 'numeric',
+    });
+
     // Construct deposit payment link
     const depositPaymentLink = `${baseUrl}/booking/${booking._id}`;
 
     // Send email with booking ID and deposit instructions
     await sendEmail(
       email,
-      'From Below Studio Booking Confirmation & Deposit Instructions',
-      `Hello ${name},
+      `From Below Studio Booking Confirmation & Deposit Instructions for ${formattedDate}`,
+`Hello ${name},
 
-      Your booking request has been received and is now pending confirmation.
+Your booking request for ${formattedDate} has been received and is now pending confirmation.
       
-      **Booking Details:**
-      - Date: ${date}
-      - Hours: ${hours}
+**Booking Details:**
+- Date: ${formattedDate}
+- Hours: ${hours}
       
-      To secure your booking, please submit a deposit using the following link:
+To secure your booking, please submit a deposit using the following link:
+${depositPaymentLink}
 
-      ${depositPaymentLink}
-
-      If you have any questions or concerns please reach out to frombelowstudio@gmail.com.`
-    );
+If you have any questions or concerns please reach out to frombelowstudio@gmail.com.`);
 
     await sendEmail(
       'hzayas1213@gmail.com', // Or use process.env.ADMIN_EMAIL
-      'New Booking Request Submitted',
-`${name} has submitted a new booking request.
+      `New Booking Request Submitted for ${formattedDate}`,
+`${name} has submitted a new booking request on ${formattedDate} for ${hours}.
     
-Booking link:
+Manage this booking using the following link:
 ${depositPaymentLink}
     
-Date: ${date}
+Date: ${formattedDate}
 Hours: ${hours}
 Email: ${email}
 Phone: ${phoneNumber}

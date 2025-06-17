@@ -13,7 +13,7 @@ const router = Router();
 router.post('/send-email', async (req: Request, res: Response) => {
   const { to, subject, text, bookingDetails, isAdmin } = req.body;
   try {
-    await sendEmail(to, subject, text, bookingDetails, isAdmin);    res.json({ message: 'Email sent successfully' });
+    await sendEmail(to, subject, text, bookingDetails, isAdmin); res.json({ message: 'Email sent successfully' });
   } catch (error) {
     console.error('Error sending email:', error);
     res.status(500).send({ message: 'Error sending email' });
@@ -30,15 +30,24 @@ router.post('/send-status-email', async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
+    const formattedDate = new Date(booking.date).toLocaleDateString('en-US', {
+      year: '2-digit',
+      month: 'numeric',
+      day: 'numeric',
+    });
+
+    const formattedStatus = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
+
+
     // 2) If it's already confirmed, don’t send again
-    if (booking.status === 'confirmed') {
-      return res
-        .status(200)
-        .json({ message: 'Booking already confirmed; no email sent.' });
-    }
+    // if (booking.status === 'confirmed') {
+    //   return res
+    //     .status(200)
+    //     .json({ message: 'Booking already confirmed; no email sent.' });
+    // }
 
     // 3) Otherwise, send the status email
-    await sendStatusEmail(to, status, bookingId, depositLink);
+    await sendStatusEmail(to, formattedStatus, bookingId, depositLink, formattedDate);
     res.json({
       message: `Status email (${status}) sent successfully to ${to}`
     });
@@ -62,8 +71,20 @@ router.post('/send-booking-change-email', async (req: Request, res: Response) =>
 
 router.post('/send-payment-status-email', async (req: Request, res: Response) => {
   const { to, name, id, paymentStatus } = req.body;
+
+  const booking = await Booking.findById(id);
+  if (!booking) {
+    throw new Error('Booking not found');
+  }
+
+  const formattedDate = new Date(booking.date).toLocaleDateString('en-US', {
+    year: '2-digit',
+    month: 'numeric',
+    day: 'numeric',
+  });
+  
   try {
-    await sendPaymentStatusEmail(to, name, id, paymentStatus);
+    await sendPaymentStatusEmail(to, name, id, paymentStatus, formattedDate);
     res.json({ message: `Payment status email sent successfully to ${to}` });
   } catch (error) {
     console.error('Error sending payment status email:', error);
