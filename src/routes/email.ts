@@ -59,9 +59,9 @@ router.post('/send-status-email', async (req: Request, res: Response) => {
 });
 
 router.post('/send-booking-change-email', async (req: Request, res: Response) => {
-  const { to, name, id, newDate, newHours } = req.body;
+  const { to, name, id, originalDate, originalHours, newDate, newHours } = req.body;
   try {
-    await sendBookingChangeEmail(to, name, id, newDate, newHours);
+    await sendBookingChangeEmail(to, name, id, originalDate, originalHours, newDate, newHours);
     res.json({ message: `Booking change email sent successfully to ${to}` });
   } catch (error) {
     console.error('Error sending booking change email:', error);

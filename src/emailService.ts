@@ -164,23 +164,34 @@ export const sendBookingChangeEmail = async (
   to: string,
   name: string,
   id: number,
+  originalDate: string,
+  originalHours: string,
   newDate: string,
   newHours: string
 ): Promise<void> => {
-  const subject = 'Your Booking Has Been Updated';
+
+
+  const formattedDate = new Date(newDate).toLocaleDateString('en-US', {
+    year: '2-digit',
+    month: 'numeric',
+    day: 'numeric',
+  });
+
+  const subject = `Your Session Has Been Updated from ${originalDate} to ${formattedDate}`;
   const text = `
     Hello ${name},
 
-    Your booking has been updated. Here are the new details:
+Your booking has been updated from from ${originalDate} to ${formattedDate}. Here are the new details:
 
-    New Date: ${newDate}
-    New Hours: ${newHours}
-    Booking Status: ${process.env.FRONTEND_URL}/booking/${id}
+  - New Date: ${formattedDate}
+  - New Hours: ${newHours}
+  - Original Date: ${originalDate}
+  - Original Hours: ${originalHours}
 
-    If you have any questions, feel free to reach out to frombelowstudio@gmail.com.
+You can view and add your booking to your calendar here:
+${baseUrl}/booking/${id}
 
-    Thank you!
-  `.trim();
+If you have any questions, feel free to reach out to frombelowstudio@gmail.com.`.trim();
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
