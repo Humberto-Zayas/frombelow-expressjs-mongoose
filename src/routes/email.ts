@@ -33,15 +33,12 @@ router.post('/send-status-email', async (req: Request, res: Response) => {
 
     const formattedDate = dayjs(booking.date).format('M/DD/YY');
 
-    // const formattedStatus = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
-
-
     // 2) If it's already confirmed, don’t send again
-    // if (booking.status === 'confirmed') {
-    //   return res
-    //     .status(200)
-    //     .json({ message: 'Booking already confirmed; no email sent.' });
-    // }
+    if (booking.status === 'confirmed') {
+      return res
+        .status(200)
+        .json({ message: 'Booking already confirmed; no email sent.' });
+    }
 
     // 3) Otherwise, send the status email
     await sendStatusEmail(to, status, bookingId, depositLink, formattedDate);
