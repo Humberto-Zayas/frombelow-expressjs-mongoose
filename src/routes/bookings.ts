@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { Booking, IBooking } from '../models/booking';
 import { DayModel, IDay, IHour } from '../models/day';
 import { sendEmail } from '../emailService';
+import dayjs from 'dayjs';
 
 // Determine the base URL based on the environment
 const baseUrl =
@@ -32,11 +33,7 @@ router.post('/bookings', async (req: Request, res: Response) => {
     });
 
     // Format date to M/D/YY
-    const formattedDate = new Date(date).toLocaleDateString('en-US', {
-      year: '2-digit',
-      month: 'numeric',
-      day: 'numeric',
-    });
+    const formattedDate = dayjs(date).format('M/DD/YY');
 
     // Construct deposit payment link
     const depositPaymentLink = `${baseUrl}/booking/${booking._id}`;

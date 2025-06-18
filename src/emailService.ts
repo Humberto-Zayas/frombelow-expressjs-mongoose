@@ -1,6 +1,7 @@
 // src/emailService.ts
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+import dayjs from 'dayjs';
 
 // Load environment variables
 dotenv.config();
@@ -170,12 +171,8 @@ export const sendBookingChangeEmail = async (
   newHours: string
 ): Promise<void> => {
 
+  const formattedDate = dayjs(newDate).format('M/DD/YY');
 
-  const formattedDate = new Date(newDate).toLocaleDateString('en-US', {
-    year: '2-digit',
-    month: 'numeric',
-    day: 'numeric',
-  });
 
   const subject = `Your Session Has Been Updated from ${originalDate} to ${formattedDate}`;
   const text = `

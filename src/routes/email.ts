@@ -7,6 +7,7 @@ import {
   sendAdminCashPaymentNotificationEmail
 } from '../emailService';
 import { Booking, IBooking } from '../models/booking';
+import dayjs from 'dayjs';
 
 const router = Router();
 
@@ -30,11 +31,7 @@ router.post('/send-status-email', async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Booking not found' });
     }
 
-    const formattedDate = new Date(booking.date).toLocaleDateString('en-US', {
-      year: '2-digit',
-      month: 'numeric',
-      day: 'numeric',
-    });
+    const formattedDate = dayjs(booking.date).format('M/DD/YY');
 
     // const formattedStatus = booking.status.charAt(0).toUpperCase() + booking.status.slice(1);
 
@@ -77,12 +74,8 @@ router.post('/send-payment-status-email', async (req: Request, res: Response) =>
     throw new Error('Booking not found');
   }
 
-  const formattedDate = new Date(booking.date).toLocaleDateString('en-US', {
-    year: '2-digit',
-    month: 'numeric',
-    day: 'numeric',
-  });
-  
+  const formattedDate = dayjs(booking.date).format('M/DD/YY');
+
   try {
     await sendPaymentStatusEmail(to, name, id, paymentStatus, formattedDate);
     res.json({ message: `Payment status email sent successfully to ${to}` });
