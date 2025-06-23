@@ -9,11 +9,24 @@ import emailRoutes from './routes/email';
 const app = express();
 const port = process.env.PORT || 3333;
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://create-react-app-site-production-d956.up.railway.app',
+  'https://frombelowstudio.com'
+];
+
 // CORS configuration
-const corsOptions = {
-  origin: 'http://localhost:3000', // Replace with your frontend URL
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow specific methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers if needed
+const corsOptions: cors.CorsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // include this if you're using cookies/auth
 };
 
 // Use CORS middleware with the options
