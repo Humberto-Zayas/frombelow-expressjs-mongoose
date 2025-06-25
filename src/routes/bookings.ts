@@ -158,39 +158,7 @@ router.delete('/bookings/:id', async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Booking not found' });
     }
 
-    if (booking.date && booking.hours) {
-      const existingDay: IDay | null = await DayModel.findOne({ date: booking.date });
-
-      if (existingDay) {
-        const bookedHourParts = booking.hours.split('/');
-        const bookedHourTitle = bookedHourParts[0].trim();
-
-        const matchingHour = existingDay.hours.find(existingHour => existingHour.hour.includes(bookedHourTitle));
-
-        if (matchingHour) {
-          matchingHour.enabled = true;
-        } else {
-          const newHour: IHour = { hour: booking.hours, enabled: true } as IHour;
-          existingDay.hours.push(newHour);
-        }
-
-        const hourOptions = [
-          '2 Hours/$70',
-          '4 Hours/$130',
-          '8 Hours/$270',
-          '10 Hours/$340',
-          'Full Day 14+ Hours/$550',
-        ];
-
-        existingDay.hours.sort((a, b) => {
-          const aIndex = hourOptions.indexOf(a.hour);
-          const bIndex = hourOptions.indexOf(b.hour);
-          return aIndex - bIndex;
-        });
-
-        await existingDay.save();
-      }
-    }
+    // ❌ Removed all logic that touches DayModel or hours
 
     await Booking.findByIdAndDelete(bookingId);
 
