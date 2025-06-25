@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 // Determine the base URL based on the environment
 const baseUrl =
   process.env.NODE_ENV === 'production'
-    ? 'https://frombelowstudio.com'
+    ? 'https://create-react-app-site-production-d956.up.railway.app'
     : 'http://localhost:3000';
 
 /**
@@ -39,7 +39,7 @@ export const sendEmail = async (
   isAdmin: boolean = false
 ): Promise<void> => {
   const baseUrl = process.env.NODE_ENV === 'production'
-  ? 'https://frombelowstudio.com'
+  ? 'https://create-react-app-site-production-d956.up.railway.app'
   : 'http://localhost:3000';
 
 const bookingLink = bookingDetails?._id

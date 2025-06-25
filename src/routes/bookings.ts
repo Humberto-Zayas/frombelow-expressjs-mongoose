@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 // Determine the base URL based on the environment
 const baseUrl =
   process.env.NODE_ENV === 'production'
-    ? 'https://frombelowstudio.com'
+    ? 'https://create-react-app-site-production-d956.up.railway.app'
     : 'http://localhost:3000';
 
 const router = Router();
