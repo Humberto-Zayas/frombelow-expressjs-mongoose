@@ -56,7 +56,7 @@ ${depositPaymentLink}
 If you have any questions or concerns please reach out to frombelowstudio@gmail.com.`);
 
     await sendEmail(
-      'hzayas1213@gmail.com', // Or use process.env.ADMIN_EMAIL
+      'frombelowstudio@gmail.com', // Or use process.env.ADMIN_EMAIL
       `New Booking Request Submitted for ${formattedDate}`,
 `${name} has submitted a new booking request on ${formattedDate} for ${hours}.
     
