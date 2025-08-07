@@ -22,10 +22,9 @@ router.post('/send-email', async (req: Request, res: Response) => {
 });
 
 router.post('/send-status-email', async (req: Request, res: Response) => {
-  const { to, status, bookingId, depositLink } = req.body;
+  const { to, status, bookingId, depositLink, reason = '' } = req.body;
 
   try {
-    // 1) Fetch the booking from the database
     const booking = await Booking.findById(bookingId).exec();
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
@@ -33,15 +32,8 @@ router.post('/send-status-email', async (req: Request, res: Response) => {
 
     const formattedDate = dayjs(booking.date).format('M/DD/YY');
 
-    // 2) If it's already confirmed, don’t send again
-    // if (booking.status === 'confirmed') {
-    //   return res
-    //     .status(200)
-    //     .json({ message: 'Booking already confirmed; no email sent.' });
-    // }
+    await sendStatusEmail(to, status, bookingId, depositLink, formattedDate, reason);
 
-    // 3) Otherwise, send the status email
-    await sendStatusEmail(to, status, bookingId, depositLink, formattedDate);
     res.json({
       message: `Status email (${status}) sent successfully to ${to}`
     });
@@ -51,6 +43,7 @@ router.post('/send-status-email', async (req: Request, res: Response) => {
     res.status(500).send({ message: 'Error sending status email' });
   }
 });
+
 
 router.post('/send-booking-change-email', async (req: Request, res: Response) => {
   const { to, name, id, originalDate, originalHours, newDate, newHours } = req.body;

@@ -97,13 +97,13 @@ export const sendStatusEmail = async (
   status: string,
   bookingId: string,
   depositLink?: string,
-  date?: string
+  date?: string,
+  reason: string = ''
 ): Promise<void> => {
   let subject: string;
   let text: string;
 
   const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1);
-
 
   if (status === 'confirmed') {
     subject = `Your Session for ${date} Has Been Confirmed`;
@@ -122,7 +122,7 @@ If you have any questions, feel free to reach out to us at frombelowstudio@gmail
   } else if (status === 'denied') {
     subject = `Your Session for ${date} Has Been Denied`;
     text = `
-      We're sorry to inform you that your booking request for ${date} has been denied.
+We're sorry to inform you that your booking request for ${date} has been denied.
 
 You can view the status of the booking here:
 ${baseUrl}/booking/${bookingId}
@@ -131,7 +131,8 @@ ${baseUrl}/booking/${bookingId}
   - Requested Booking Date: ${date}
   - Session Status: ${formattedStatus}
 
-If you have any questions or concerns, please reach out to us at frombelowstudio@gmail.com.`.trim();
+${reason ? `**Reason for Denial:**\n${reason}\n\n` : ''}If you have any questions or concerns, please reach out to us at frombelowstudio@gmail.com.`.trim();
+
   } else {
     throw new Error('Invalid status. Status should be "confirmed" or "denied".');
   }
