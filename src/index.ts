@@ -14,33 +14,25 @@ const host = process.env.HOSTNAME || "0.0.0.0";
 const allowedOrigins = [
   'http://localhost:3000',
   'https://create-react-app-site-production-d956.up.railway.app',
-  'https://frombelowstudio.com',
-  'https://expressjs-mongoose-production-6969.up.railway.app'
+  'https://frombelowstudio.com'
 ];
 
 // CORS configuration
 const corsOptions: cors.CorsOptions = {
   origin: function (origin, callback) {
-    if (!origin) {
-      // Allow requests with no origin (like Postman or server-to-server)
-      return callback(null, true);
-    }
-    const isAllowed = allowedOrigins.some(o => origin.startsWith(o));
-    if (isAllowed) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS: ' + origin));
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  credentials: true // include this if you're using cookies/auth
 };
 
 // Use CORS middleware with the options
 app.use(cors(corsOptions));
-
-app.options('*', cors(corsOptions));
 
 app.use(express.json());
 app.use(express.raw({ type: "application/vnd.custom-type" }));
