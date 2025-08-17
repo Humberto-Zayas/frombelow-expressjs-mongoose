@@ -4,7 +4,8 @@ import {
   sendStatusEmail,
   sendBookingChangeEmail,
   sendPaymentStatusEmail,
-  sendAdminCashPaymentNotificationEmail
+  sendAdminCashPaymentNotificationEmail,
+  sendContactEmail
 } from '../emailService';
 import { Booking, IBooking } from '../models/booking';
 import dayjs from 'dayjs';
@@ -85,6 +86,27 @@ router.post('/send-cash-payment-notification', async (req: Request, res: Respons
     res.status(500).send({ message: 'Error sending cash payment notification email' });
   }
 });
+
+router.post('/send-contact-email', async (req: Request, res: Response) => {
+  const { name, email, phoneNumber, serviceType, referral, message } = req.body;
+
+  try {
+    await sendContactEmail(
+      name,
+      email,
+      phoneNumber,
+      serviceType,
+      referral,
+      message
+    );
+
+    res.json({ message: 'Contact email sent successfully' });
+  } catch (error) {
+    console.error('Error sending contact email:', error);
+    res.status(500).json({ message: 'Failed to send contact email' });
+  }
+});
+
 
 
 export default router;

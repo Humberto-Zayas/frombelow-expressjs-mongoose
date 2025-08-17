@@ -39,18 +39,18 @@ export const sendEmail = async (
   isAdmin: boolean = false
 ): Promise<void> => {
   const baseUrl = process.env.NODE_ENV === 'production'
-  ? 'https://create-react-app-site-production-d956.up.railway.app'
-  : 'http://localhost:3000';
+    ? 'https://create-react-app-site-production-d956.up.railway.app'
+    : 'http://localhost:3000';
 
-const bookingLink = bookingDetails?._id
-  ? `${baseUrl}/booking/${bookingDetails._id}`
-  : '';
+  const bookingLink = bookingDetails?._id
+    ? `${baseUrl}/booking/${bookingDetails._id}`
+    : '';
 
-const formattedDetails = bookingDetails
-  ? `
+  const formattedDetails = bookingDetails
+    ? `
     ${isAdmin
-      ? `${bookingDetails.name} has sent a new booking request. Manage it here: ${bookingLink}`
-      : text}
+        ? `${bookingDetails.name} has sent a new booking request. Manage it here: ${bookingLink}`
+        : text}
 
     Booking Details:
     ----------------
@@ -62,7 +62,7 @@ const formattedDetails = bookingDetails
     Date: ${bookingDetails.date}
     Hours: ${bookingDetails.hours}
   `.trim()
-  : text;
+    : text;
 
 
   // Email configuration
@@ -227,9 +227,9 @@ export const sendPaymentStatusEmail = async (
 ): Promise<void> => {
 
   const formattedStatus = paymentStatus
-  .split('_') // ['deposit', 'paid']
-  .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // ['Deposit', 'Paid']
-  .join(' '); // 'Deposit Paid'
+    .split('_') // ['deposit', 'paid']
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1)) // ['Deposit', 'Paid']
+    .join(' '); // 'Deposit Paid'
 
   const subject = `Your Session for ${date} is Confirmed`;
   const text = `
@@ -310,5 +310,42 @@ From Below Studio
   } catch (error) {
     console.error(`Failed to send cash payment notification email to ${to}:`, error);
     throw new Error(`Failed to send cash payment notification email to ${to}`);
+  }
+};
+
+export const sendContactEmail = async (
+  name: string,
+  email: string,
+  phoneNumber: string,
+  serviceType: string,
+  referral: string,
+  message: string
+): Promise<void> => {
+  const subject = `New Contact Form Submission: ${serviceType}`;
+
+  const text = `
+Name: ${name}
+Email: ${email}
+Phone: ${phoneNumber}
+Service: ${serviceType}
+Referral: ${referral}
+
+Message:
+${message}
+  `.trim();
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_USER, // or a dedicated inbox
+    subject,
+    text,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Contact email sent successfully");
+  } catch (error) {
+    console.error("Failed to send contact email:", error);
+    throw new Error("Failed to send contact email");
   }
 };
