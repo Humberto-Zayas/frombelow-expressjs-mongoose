@@ -7,7 +7,9 @@ import bookingRoutes from './routes/bookings';
 import emailRoutes from './routes/email';
 
 const app = express();
-const port = process.env.PORT || 3333;
+const port = parseInt(process.env.PORT || "3333", 10);
+
+const host = process.env.HOSTNAME || "0.0.0.0";
 
 const allowedOrigins = [
   'http://localhost:3000',
@@ -45,6 +47,6 @@ app.use("/days", dayRoutes);
 app.use('/bookings', bookingRoutes);
 app.use('/email', emailRoutes);
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+app.listen(port, host, () => {
+  console.log(`Server listening at http://${host}:${port}`);
 });
