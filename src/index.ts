@@ -18,15 +18,17 @@ const allowedOrigins = [
 // CORS configuration
 const corsOptions: cors.CorsOptions = {
   origin: function (origin, callback) {
+    console.log('Received origin:', origin); // Debug log
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('Rejected origin:', origin); // Debug log
       callback(new Error('Not allowed by CORS'));
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // include this if you're using cookies/auth
+  credentials: true
 };
 
 // Use CORS middleware with the options

@@ -38,39 +38,66 @@ router.post('/bookings', async (req: Request, res: Response) => {
     // Construct deposit payment link
     const depositPaymentLink = `${baseUrl}/booking/${booking._id}`;
 
-    // Send email with booking ID and deposit instructions
-    await sendEmail(
-      email,
-      `From Below Studio Booking Confirmation & Deposit Instructions for ${formattedDate}`,
+    // Track email status separately from booking creation
+    const emailStatus = { customer: false, admin: false, error: null as string | null };
+
+    // Send customer email - wrapped in separate try-catch
+    try {
+      await sendEmail(
+        email,
+        `From Below Studio Booking Confirmation & Deposit Instructions for ${formattedDate}`,
 `Hello ${name},
 
 Your booking request for ${formattedDate} has been received and is now pending confirmation.
-      
+
 **Booking Details:**
 - Date: ${formattedDate}
 - Hours: ${hours}
-      
+
 To secure your booking, please submit a deposit using the following link:
 ${depositPaymentLink}
 
 If you have any questions or concerns please reach out to frombelowstudio@gmail.com.`);
+      emailStatus.customer = true;
+    } catch (emailError) {
+      const errorMsg = emailError instanceof Error ? emailError.message : 'Unknown email error';
+      console.error('Customer email failed:', errorMsg);
+      emailStatus.error = errorMsg;
+    }
 
-    await sendEmail(
-      'frombelowstudio@gmail.com', // Or use process.env.ADMIN_EMAIL
-      `New Booking Request Submitted for ${formattedDate}`,
+    // Send admin email - wrapped in separate try-catch
+    try {
+      await sendEmail(
+        process.env.ADMIN_EMAIL || 'frombelowstudio@gmail.com',
+        `New Booking Request Submitted for ${formattedDate}`,
 `${name} has submitted a new booking request on ${formattedDate} for ${hours}.
-    
+
 Manage this booking using the following link:
 ${depositPaymentLink}
-    
+
 Date: ${formattedDate}
 Hours: ${hours}
 Email: ${email}
 Phone: ${phoneNumber}
 Message: ${message}
 Heard about us via: ${howDidYouHear}`);
+      emailStatus.admin = true;
+    } catch (emailError) {
+      const errorMsg = emailError instanceof Error ? emailError.message : 'Unknown email error';
+      console.error('Admin email failed:', errorMsg);
+      if (!emailStatus.error) {
+        emailStatus.error = errorMsg;
+      }
+    }
 
-    res.json(booking);
+    // Always return 201 if booking was created successfully
+    res.status(201).json({
+      booking,
+      emailStatus,
+      message: emailStatus.customer && emailStatus.admin
+        ? 'Booking created and emails sent'
+        : 'Booking created but some emails failed to send'
+    });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     res.status(400).json({ error: errorMessage });
