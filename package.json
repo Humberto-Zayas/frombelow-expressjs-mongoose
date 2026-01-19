@@ -6,7 +6,7 @@
   "author": "Faraz Patankar",
   "license": "MIT",
   "engines": {
-    "node": "20.20.0"
+    "node": ">=20.18.0"
   },
   "scripts": {
     "dev": "nodemon src/index.ts",
