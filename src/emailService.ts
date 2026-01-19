@@ -1,21 +1,16 @@
 // src/emailService.ts
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import dotenv from 'dotenv';
 import dayjs from 'dayjs';
 
 // Load environment variables
 dotenv.config();
 
-// Create a transporter using Gmail
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  connectionTimeout: 10000, // 10 seconds
-  socketTimeout: 15000,     // 15 seconds
-} as nodemailer.TransportOptions);
+// Initialize Resend client
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+// From address for all emails
+const FROM_ADDRESS = 'From Below Studio <noreply@frombelowstudio.com>';
 
 // Determine the base URL based on the environment
 const baseUrl =
@@ -25,12 +20,12 @@ const baseUrl =
 
 /**
  * Sends an email with optional booking details.
- * 
+ *
  * @param to - The recipient's email address.
  * @param subject - The email subject.
  * @param text - The base email message.
  * @param bookingDetails - Optional booking details to include in the email.
- * 
+ *
  * @returns A Promise resolving the result of the email send operation.
  */
 export const sendEmail = async (
@@ -66,18 +61,13 @@ export const sendEmail = async (
   `.trim()
     : text;
 
-
-  // Email configuration
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text: formattedDetails,
-  };
-
   try {
-    // Send the email
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to,
+      subject,
+      text: formattedDetails,
+    });
     console.log(`Email sent successfully to ${to}`);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -88,7 +78,7 @@ export const sendEmail = async (
 
 /**
  * Sends a status update email to the client (confirmed or denied).
- * 
+ *
  * @param to - The recipient's email address.
  * @param status - The status of the booking ('confirmed' or 'denied').
  * @param bookingId - The ID of the booking.
@@ -140,15 +130,13 @@ ${reason ? `**Reason for Denial:**\n${reason}\n\n` : ''}If you have any question
     throw new Error('Invalid status. Status should be "confirmed" or "denied".');
   }
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to,
+      subject,
+      text,
+    });
     console.log(`Status email sent successfully to ${to}`);
   } catch (error) {
     console.error(`Failed to send status email to ${to}:`, error);
@@ -158,7 +146,7 @@ ${reason ? `**Reason for Denial:**\n${reason}\n\n` : ''}If you have any question
 
 /**
  * Sends an email notification when a booking is updated.
- * 
+ *
  * @param to - The recipient's email address.
  * @param name - The name of the client.
  * @param newDate - The updated date of the booking.
@@ -194,15 +182,13 @@ ${baseUrl}/booking/${id}
 
 If you have any questions, feel free to reach out to frombelowstudio@gmail.com.`.trim();
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to,
+      subject,
+      text,
+    });
     console.log(`Booking change email sent successfully to ${to}`);
   } catch (error) {
     console.error(`Failed to send booking change email to ${to}:`, error);
@@ -212,7 +198,7 @@ If you have any questions, feel free to reach out to frombelowstudio@gmail.com.`
 
 /**
  * Sends an email notification when a booking payment status is updated.
- * 
+ *
  * @param to - The recipient's email address.
  * @param name - The name of the client.
  * @param id - The booking ID.
@@ -249,18 +235,16 @@ ${baseUrl}/booking/${id}
 
 If you have any questions, feel free to reach out to frombelowstudio@gmail.com.
 
-Best regards,  
+Best regards,
 From Below Studio`.trim();
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to,
+      subject,
+      text,
+    });
     console.log(`Payment status email sent successfully to ${to}`);
   } catch (error) {
     console.error(`Failed to send payment status email to ${to}:`, error);
@@ -291,24 +275,22 @@ export const sendAdminCashPaymentNotificationEmail = async (
 
 
 ${clientName} wants to pay using ${paymentMethod} for their session.
-${notes ? `Client Notes:\n"${notes}"\n` : ''}  
+${notes ? `Client Notes:\n"${notes}"\n` : ''}
 Review and confirm the session manually in the admin dashboard:
 
 ${baseUrl}/booking/${bookingId}
 
-Thanks,  
+Thanks,
 From Below Studio
 `.trim();
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to,
-    subject,
-    text,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to,
+      subject,
+      text,
+    });
     console.log(`Cash payment notification email sent to ${to}`);
   } catch (error) {
     console.error(`Failed to send cash payment notification email to ${to}:`, error);
@@ -337,15 +319,13 @@ Message:
 ${message}
   `.trim();
 
-  const mailOptions = {
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER, // or a dedicated inbox
-    subject,
-    text,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
+    await resend.emails.send({
+      from: FROM_ADDRESS,
+      to: process.env.ADMIN_EMAIL || 'frombelowstudio@gmail.com',
+      subject,
+      text,
+    });
     console.log("Contact email sent successfully");
   } catch (error) {
     console.error("Failed to send contact email:", error);
